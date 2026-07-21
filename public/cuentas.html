@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Gastos - Cuentas y Bancos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    
+    <header>
+      <h1>Control de Gastos</h1>
+      <div id="user-info">
+        <span id="user-display"></span>
+        <button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <a href="index.html" class="tab-btn">📊 Movimientos</a>
+      <a href="categorias.html" class="tab-btn">🏷️ Categorías</a>
+      <a href="cuentas.html" class="tab-btn active">🏦 Cuentas / Bancos</a>
+      <a href="estadisticas.html" class="tab-btn">📈 Estadísticas</a>
+    </nav>
+
+    <!-- Formulario Cuenta -->
+    <section class="card">
+      <h2>Nueva Cuenta / Banco Personalizado</h2>
+      <form id="form-cuenta">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cuenta-nombre">Nombre del Banco o Cuenta:</label>
+            <input type="text" id="cuenta-nombre" placeholder="Ej: Efectivo USD, Zelle, Binance" required>
+          </div>
+          <div class="form-group">
+            <label for="cuenta-moneda">Moneda:</label>
+            <select id="cuenta-moneda" required>
+              <option value="VES">VES (Bolívares)</option>
+              <option value="USD">USD (Dólares)</option>
+              <option value="EUR">EUR (Euros)</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">Guardar Cuenta</button>
+      </form>
+    </section>
+
+    <!-- Tabla Cuentas -->
+    <section class="card">
+      <h2>Cuentas y Bancos Registrados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Banco / Cuenta</th>
+            <th>Moneda</th>
+            <th>Saldo Actual</th>
+            <th>Origen</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-cuentas-body">
+          <!-- Carga dinámicamente -->
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

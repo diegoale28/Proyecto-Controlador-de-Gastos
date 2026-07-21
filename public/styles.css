@@ -1,0 +1,431 @@
+/* 1. VARIABLES Y ESTILOS BASE */
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-light: #e0e7ff;
+  
+  --ingreso: #10b981;
+  --ingreso-bg: #ecfdf5;
+  --egreso: #ef4444;
+  --egreso-bg: #fef2f2;
+  --balance: #0284c7;
+  --balance-bg: #f0f9ff;
+
+  --bg-body: #f8fafc;
+  --card-bg: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  line-height: 1.5;
+  padding: 20px 16px;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* 2. HEADER */
+header {
+  background: var(--card-bg);
+  padding: 18px 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+#user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#user-display {
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.btn-logout {
+  background-color: var(--egreso-bg);
+  color: var(--egreso);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.btn-logout:hover {
+  background-color: var(--egreso);
+  color: #ffffff;
+}
+
+/* 3. PESTAÑAS DE NAVEGACIÓN RESPONSIVE */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  /* Habilita desplazamiento horizontal suave en móviles */
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Oculta barra en Firefox */
+}
+
+.tabs::-webkit-scrollbar {
+  display: none; /* Oculta barra en Chrome/Safari */
+}
+
+.tab-btn {
+  text-decoration: none;
+  padding: 10px 18px;
+  background-color: var(--card-bg);
+  color: var(--text-muted);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0; /* Evita que las pestañas se encojan en pantallas pequeñas */
+}
+
+.tab-btn:hover {
+  color: var(--primary);
+  border-color: var(--primary-light);
+}
+
+.tab-btn.active {
+  background-color: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+/* 4. TARJETAS DE BALANCE */
+.balance-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.balance-cards .card {
+  margin-bottom: 0;
+  border-left: 5px solid var(--border);
+}
+
+.card-ingreso { border-left-color: var(--ingreso) !important; }
+.card-egreso  { border-left-color: var(--egreso) !important; }
+.card-balance { border-left-color: var(--balance) !important; }
+
+.card-ingreso h3 { color: var(--ingreso); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.card-egreso h3  { color: var(--egreso);  font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.card-balance h3 { color: var(--balance); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.balance-cards p {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-top: 6px;
+}
+
+/* 5. CONTENEDORES Y FORMULARIOS */
+.card {
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.card h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  background-color: #f8fafc;
+  color: var(--text-main);
+  outline: none;
+  transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+  align-self: flex-start;
+}
+
+.btn-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+}
+
+/* 6. TABLAS DE DATOS CON SCROLL */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 550px; /* Garantiza que las columnas no se aplasten demasiado */
+  font-size: 0.9rem;
+}
+
+th, td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background-color: #f1f5f9;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+tr:hover {
+  background-color: #f8fafc;
+}
+
+td.ingreso { color: var(--ingreso); font-weight: 700; }
+td.egreso  { color: var(--egreso);  font-weight: 700; }
+
+.badge {
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: inline-block;
+  text-transform: uppercase;
+}
+
+.badge-system { background-color: #e2e8f0; color: #475569; }
+.badge-custom { background-color: var(--primary-light); color: var(--primary); }
+
+.btn-del {
+  background-color: transparent;
+  color: var(--egreso);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.btn-del:hover {
+  background-color: var(--egreso);
+  color: #ffffff;
+}
+
+/* 7. GRÁFICOS Y ESTADÍSTICAS */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 320px;
+  width: 100%;
+}
+
+/* 8. LOGIN / REGISTRO */
+.auth-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 40px auto;
+  background: var(--card-bg);
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.auth-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.hidden { display: none !important; }
+
+/* 9. REGLAS RESPONSIVE (MEDIA QUERIES) */
+
+/* Tablets / Pantallas Medianas (<= 768px) */
+@media (max-width: 768px) {
+  body {
+    padding: 12px 8px;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  #user-info {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr; /* Una sola columna en formularios */
+  }
+
+  .btn-submit {
+    width: 100%; /* Botón al 100% en pantallas pequeñas */
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-wrapper {
+    height: 280px; /* Ajuste de altura para pantallas pequeñas */
+  }
+}
+
+/* Teléfonos Pequeños (<= 480px) */
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.3rem;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .balance-cards p {
+    font-size: 1.5rem;
+  }
+
+  th, td {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+}

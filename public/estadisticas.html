@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Gastos - Estadísticas</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- CDN de Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    
+    <header>
+      <h1>Control de Gastos</h1>
+      <div id="user-info">
+        <span id="user-display"></span>
+        <button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <a href="index.html" class="tab-btn">📊 Movimientos</a>
+      <a href="categorias.html" class="tab-btn">🏷️ Categorías</a>
+      <a href="cuentas.html" class="tab-btn">🏦 Cuentas / Bancos</a>
+      <a href="estadisticas.html" class="tab-btn active">📈 Estadísticas</a>
+    </nav>
+
+    <div class="charts-grid">
+      <!-- Gráfico Categorías -->
+      <section class="card">
+        <h2>Gastos por Categoría</h2>
+        <div class="chart-wrapper">
+          <canvas id="chart-categorias"></canvas>
+        </div>
+      </section>
+
+      <!-- Gráfico Cuentas -->
+      <section class="card">
+        <h2>Gastos por Banco / Cuenta</h2>
+        <div class="chart-wrapper">
+          <canvas id="chart-cuentas"></canvas>
+        </div>
+      </section>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

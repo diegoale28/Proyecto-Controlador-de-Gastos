@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Gastos - Movimientos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Encabezado -->
+    <header>
+      <h1>Control de Gastos</h1>
+      <div id="user-info">
+        <span id="user-display"></span>
+        <button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </header>
+
+    <!-- Navegación -->
+    <nav class="tabs">
+      <a href="index.html" class="tab-btn active">📊 Movimientos</a>
+      <a href="categorias.html" class="tab-btn">🏷️ Categorías</a>
+      <a href="cuentas.html" class="tab-btn">🏦 Cuentas / Bancos</a>
+      <a href="estadisticas.html" class="tab-btn">📈 Estadísticas</a>
+    </nav>
+
+    <!-- Resumen de Balance -->
+    <section class="balance-cards">
+      <div class="card card-ingreso">
+        <h3>INGRESOS</h3>
+        <p id="total-ingresos">$0.00</p>
+      </div>
+      <div class="card card-egreso">
+        <h3>EGRESOS</h3>
+        <p id="total-egresos">$0.00</p>
+      </div>
+      <div class="card card-balance">
+        <h3>BALANCE TOTAL</h3>
+        <p id="total-balance">$0.00</p>
+      </div>
+    </section>
+
+    <!-- Formulario Nuevo Movimiento -->
+    <section class="card">
+      <h2>Nuevo Movimiento</h2>
+      <form id="form-transaccion">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipo">Tipo:</label>
+            <select id="tipo" required>
+              <option value="egreso">Egreso</option>
+              <option value="ingreso">Ingreso</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="categoria_id">Categoría:</label>
+            <select id="categoria_id" required></select>
+          </div>
+
+          <div class="form-group">
+            <label for="cuenta_id">Cuenta / Banco:</label>
+            <select id="cuenta_id" required></select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="monto">Monto ($ / Bs):</label>
+            <input type="number" id="monto" step="0.01" min="0.01" placeholder="0.00" required>
+          </div>
+
+          <div class="form-group">
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="fecha" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción:</label>
+          <input type="text" id="descripcion" placeholder="Ej: Compra de supermercado">
+        </div>
+
+        <button type="submit" class="btn-submit">Guardar Movimiento</button>
+      </form>
+    </section>
+
+    <!-- Historial -->
+    <section class="card">
+      <h2>Historial de Movimientos</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Categoría</th>
+            <th>Descripción</th>
+            <th>Monto</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-body">
+          <!-- Carga dinámicamente -->
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
