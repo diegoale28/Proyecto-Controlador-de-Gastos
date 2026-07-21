@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = 3000;
@@ -15,7 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '', // Ajusta con tu contraseña de MySQL si la tienes
+  password: '', // Ajusta si tienes clave en MySQL
   database: 'control_gastos'
 });
 
@@ -27,9 +28,11 @@ db.connect((err) => {
   console.log('✅ Conectado exitosamente a la base de datos MySQL.');
 });
 
+// ==========================================
 // RUTA 1: AUTENTICACIÓN Y USUARIOS
+// ==========================================
 
-// POST /api/register - Registro de nuevo usuario
+// POST /api/register - Registro con encriptación de contraseña
 app.post('/api/register', (req, res) => {
   const { nombre, email, password } = req.body;
 
@@ -37,19 +40,26 @@ app.post('/api/register', (req, res) => {
     return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   }
 
-  const query = 'INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)';
-  db.query(query, [nombre.trim(), email.trim().toLowerCase(), password], (err, result) => {
+  // Encriptar la contraseña (10 rondas de seguridad)
+  bcrypt.hash(password, 10, (err, passwordHash) => {
     if (err) {
-      if (err.code === 'ER_DUP_ENTRY') {
-        return res.status(400).json({ error: 'El correo electrónico ya está registrado' });
-      }
-      return res.status(500).json({ error: err.message });
+      return res.status(500).json({ error: 'Error al procesar la contraseña' });
     }
-    res.json({ message: 'Usuario registrado con éxito', userId: result.insertId });
+
+    const query = 'INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)';
+    db.query(query, [nombre.trim(), email.trim().toLowerCase(), passwordHash], (err, result) => {
+      if (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+          return res.status(400).json({ error: 'El correo electrónico ya está registrado' });
+        }
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ message: 'Usuario registrado con éxito', userId: result.insertId });
+    });
   });
 });
 
-// POST /api/login - Inicio de sesión
+// POST /api/login - Inicio de sesión comparando hash
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -57,21 +67,35 @@ app.post('/api/login', (req, res) => {
     return res.status(400).json({ error: 'Ingresa correo y contraseña' });
   }
 
-  const query = 'SELECT id, nombre, email FROM usuarios WHERE email = ? AND password = ?';
-  db.query(query, [email.trim().toLowerCase(), password], (err, results) => {
+  const query = 'SELECT id, nombre, email, password FROM usuarios WHERE email = ?';
+  db.query(query, [email.trim().toLowerCase()], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
 
     if (results.length === 0) {
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
 
-    res.json({ message: 'Inicio de sesión exitoso', usuario: results[0] });
+    const usuario = results[0];
+
+    // Verificar si la clave escrita coincide con el hash guardado
+    bcrypt.compare(password, usuario.password, (err, esValida) => {
+      if (err) return res.status(500).json({ error: 'Error al verificar credenciales' });
+
+      if (!esValida) {
+        return res.status(401).json({ error: 'Credenciales incorrectas' });
+      }
+
+      delete usuario.password; // Quitar el hash de la respuesta por seguridad
+      res.json({ message: 'Inicio de sesión exitoso', usuario });
+    });
   });
 });
 
+// ==========================================
 // RUTA 2: CUENTAS Y BANCOS
+// ==========================================
 
-// GET /api/cuentas - Obtener cuentas predeterminadas y personalizadas con saldo
+// GET /api/cuentas - Obtener cuentas con saldo acumulado
 app.get('/api/cuentas', (req, res) => {
   const userId = req.headers['x-user-id'];
 
@@ -117,7 +141,7 @@ app.post('/api/cuentas', (req, res) => {
   });
 });
 
-// DELETE /api/cuentas/:id - Eliminar cuenta personalizada
+// DELETE /api/cuentas/:id - Eliminar cuenta
 app.delete('/api/cuentas/:id', (req, res) => {
   const userId = req.headers['x-user-id'];
   const cuentaId = req.params.id;
@@ -132,9 +156,11 @@ app.delete('/api/cuentas/:id', (req, res) => {
   });
 });
 
+// ==========================================
 // RUTA 3: CATEGORÍAS
+// ==========================================
 
-// GET /api/categorias - Obtener categorías predeterminadas y del usuario
+// GET /api/categorias
 app.get('/api/categorias', (req, res) => {
   const userId = req.headers['x-user-id'];
 
@@ -151,7 +177,7 @@ app.get('/api/categorias', (req, res) => {
   });
 });
 
-// POST /api/categorias - Crear categoría personalizada
+// POST /api/categorias
 app.post('/api/categorias', (req, res) => {
   const userId = req.headers['x-user-id'];
   const { nombre, tipo } = req.body;
@@ -167,7 +193,7 @@ app.post('/api/categorias', (req, res) => {
   });
 });
 
-// DELETE /api/categorias/:id - Eliminar categoría personalizada
+// DELETE /api/categorias/:id
 app.delete('/api/categorias/:id', (req, res) => {
   const userId = req.headers['x-user-id'];
   const categoriaId = req.params.id;
@@ -182,11 +208,11 @@ app.delete('/api/categorias/:id', (req, res) => {
   });
 });
 
+// ==========================================
+// RUTA 4: TRANSACCIONES Y ESTADÍSTICAS
+// ==========================================
 
-// RUTA 4: TRANSACCIONES Y BALANCE
-
-
-// GET /api/transacciones - Obtener historial de movimientos del usuario
+// GET /api/transacciones
 app.get('/api/transacciones', (req, res) => {
   const userId = req.headers['x-user-id'];
 
@@ -212,7 +238,7 @@ app.get('/api/transacciones', (req, res) => {
   });
 });
 
-// POST /api/transacciones - Guardar un nuevo movimiento
+// POST /api/transacciones
 app.post('/api/transacciones', (req, res) => {
   const userId = req.headers['x-user-id'];
   const { tipo, categoria_id, cuenta_id, monto, fecha, descripcion } = req.body;
@@ -236,7 +262,7 @@ app.post('/api/transacciones', (req, res) => {
   );
 });
 
-// DELETE /api/transacciones/:id - Eliminar una transacción
+// DELETE /api/transacciones/:id
 app.delete('/api/transacciones/:id', (req, res) => {
   const userId = req.headers['x-user-id'];
   const transaccionId = req.params.id;
@@ -248,7 +274,7 @@ app.delete('/api/transacciones/:id', (req, res) => {
   });
 });
 
-// GET /api/balance - Obtener balance general (Ingresos, Egresos, Balance)
+// GET /api/balance
 app.get('/api/balance', (req, res) => {
   const userId = req.headers['x-user-id'];
 
@@ -267,12 +293,11 @@ app.get('/api/balance', (req, res) => {
   });
 });
 
-// Endpoint para obtener datos agrupados para las estadísticas
+// GET /api/estadisticas
 app.get('/api/estadisticas', (req, res) => {
   const userId = req.headers['x-user-id'];
   if (!userId) return res.status(401).json({ error: 'Usuario no autenticado' });
 
-  // 1. Gastos por Categoría
   const sqlCategorias = `
     SELECT c.nombre AS categoria, SUM(t.monto) AS total
     FROM transacciones t
@@ -281,7 +306,6 @@ app.get('/api/estadisticas', (req, res) => {
     GROUP BY c.id, c.nombre
   `;
 
-  // 2. Gastos por Cuenta / Banco
   const sqlCuentas = `
     SELECT cu.nombre AS cuenta, SUM(t.monto) AS total
     FROM transacciones t
