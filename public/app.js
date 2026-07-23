@@ -12,9 +12,10 @@ if (!usuarioGuardado && !esPaginaLogin) {
 
 const usuario = usuarioGuardado ? JSON.parse(usuarioGuardado) : null;
 
-// Variables globales para gráficos de Chart.js
+// Variables globales
 let chartCategoriasInstance = null;
 let chartCuentasInstance = null;
+let todasLasTransacciones = []; // Almacena movimientos para el filtro de fecha
 
 // Función para alternar entre Login y Registro en login.html
 function mostrarFormularioAuth(tipo) {
@@ -59,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     userDisplay.textContent = `Hola, ${usuario.nombre}`;
   }
 
-  // Establecer fecha de hoy por defecto
+  // Establecer fecha de hoy por defecto en el formulario
   const fechaInput = document.getElementById('fecha');
   if (fechaInput) {
     fechaInput.value = new Date().toISOString().split('T')[0];
@@ -102,6 +103,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const formCuenta = document.getElementById('form-cuenta');
   if (formCuenta) formCuenta.addEventListener('submit', guardarCuenta);
+
+  // Buscador por fecha (Eventos)
+  const filtroFecha = document.getElementById('filtro-fecha');
+  if (filtroFecha) {
+    filtroFecha.addEventListener('change', aplicarFiltroFecha);
+  }
+
+  const btnLimpiar = document.getElementById('btn-limpiar-filtro');
+  if (btnLimpiar) {
+    btnLimpiar.addEventListener('click', () => {
+      if (filtroFecha) filtroFecha.value = '';
+      aplicarFiltroFecha();
+    });
+  }
 });
 
 // PETICIONES DE LOGIN Y REGISTRO
@@ -211,33 +226,52 @@ async function cargarTransacciones() {
   if (!tbody) return;
   try {
     const res = await fetch('/api/transacciones', { headers: getHeaders() });
-    const transacciones = await res.json();
-    tbody.innerHTML = '';
-
-    if (transacciones.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay movimientos registrados</td></tr>';
-      return;
-    }
-
-    transacciones.forEach(t => {
-      const tr = document.createElement('tr');
-      const esIngreso = t.tipo === 'ingreso';
-      const signo = esIngreso ? '+' : '-';
-      const claseMonto = esIngreso ? 'ingreso' : 'egreso';
-
-      tr.innerHTML = `
-        <td>${t.fecha}</td>
-        <td><strong>${t.categoria || 'Sin cat.'}</strong> <br><small style="color:#777">${t.cuenta || 'Sin cuenta'}</small></td>
-        <td>${t.descripcion || '-'}</td>
-        <td class="${claseMonto}">${signo} $${parseFloat(t.monto).toFixed(2)}</td>
-        <td>
-          <button class="btn-del" onclick="eliminarTransaccion(${t.id})">Eliminar</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+    todasLasTransacciones = await res.json();
+    aplicarFiltroFecha();
   } catch (err) {
     console.error('Error cargando transacciones:', err);
+  }
+}
+
+function renderizarTablaTransacciones(transacciones) {
+  const tbody = document.getElementById('tabla-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  if (transacciones.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay movimientos registrados para esta fecha</td></tr>';
+    return;
+  }
+
+  transacciones.forEach(t => {
+    const tr = document.createElement('tr');
+    const esIngreso = t.tipo === 'ingreso';
+    const signo = esIngreso ? '+' : '-';
+    const claseMonto = esIngreso ? 'ingreso' : 'egreso';
+
+    tr.innerHTML = `
+      <td>${t.fecha}</td>
+      <td><strong>${t.categoria || 'Sin cat.'}</strong> <br><small style="color:#777">${t.cuenta || 'Sin cuenta'}</small></td>
+      <td>${t.descripcion || '-'}</td>
+      <td class="${claseMonto}">${signo} $${parseFloat(t.monto).toFixed(2)}</td>
+      <td>
+        <button class="btn-del" onclick="eliminarTransaccion(${t.id})">Eliminar</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function aplicarFiltroFecha() {
+  const filtroInput = document.getElementById('filtro-fecha');
+  if (!filtroInput) return renderizarTablaTransacciones(todasLasTransacciones);
+
+  const fechaSeleccionada = filtroInput.value;
+  if (!fechaSeleccionada) {
+    renderizarTablaTransacciones(todasLasTransacciones);
+  } else {
+    const filtradas = todasLasTransacciones.filter(t => t.fecha === fechaSeleccionada);
+    renderizarTablaTransacciones(filtradas);
   }
 }
 
@@ -291,7 +325,6 @@ async function eliminarTransaccion(id) {
     console.error('Error eliminando transacción:', err);
   }
 }
-
 
 // VISTA: CATEGORÍAS (CATEGORIAS.HTML)
 

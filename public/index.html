@@ -89,22 +89,32 @@
 
     <!-- Historial -->
     <section class="card">
-      <h2>Historial de Movimientos</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+        <h2 style="margin: 0;">Historial de Movimientos</h2>
+        
+        <!-- Buscador por fecha -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label for="filtro-fecha" style="font-weight: 500; font-size: 0.9rem; color: #555;">Filtrar por fecha:</label>
+          <input type="date" id="filtro-fecha" style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px;">
+          <button type="button" id="btn-limpiar-filtro" class="btn-logout" style="padding: 6px 12px; background-color: #c0d8ec;">Mostrar todos</button>
+        </div>
+      </div>
+
       <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Categoría</th>
-            <th>Descripción</th>
-            <th>Monto</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody id="tabla-body">
-          <!-- Carga dinámicamente -->
-        </tbody>
-      </table>
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Categoría</th>
+              <th>Descripción</th>
+              <th>Monto</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-body">
+            <!-- Carga dinámicamente -->
+          </tbody>
+        </table>
       </div>
     </section>
 
